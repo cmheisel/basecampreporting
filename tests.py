@@ -14,8 +14,9 @@ class ProjectTests(unittest.TestCase):
         self.assertEqual("This is the newest message",
                          self.project.messages[0].title)
 
-        print self.project.messages[0].id
-        print self.project.messages[0].posted_on
+    def test_latest_comment(self):
+        self.assertEqual("This is the latest comment",
+                         self.project.comments[0].body)
 
 def main():
     unittest.main()
