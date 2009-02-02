@@ -6,6 +6,7 @@ except ImportError:
     from elementtree import ElementTree
 
 from basecamp import Basecamp
+from pyactiveresource import activeresource
 
 class Project(object):
     '''Represents a project in Basecamp.'''
@@ -35,7 +36,53 @@ class Project(object):
         comments.sort()
         comments.reverse()
         return comments
-            
+
+    @property
+    def milestones(self):
+        '''Array of all milestones'''
+        milestone_xml = self.bc.list_milestones(self.id)
+        milestones = []
+        for node in ElementTree.fromstring(milestone_xml).findall("milestone"):
+            milestones.append(Milestone(node))
+
+        milestones.sort()
+        milestones.reverse()
+        return milestones
+
+    @property
+    def late_milestones(self):
+        '''Array of all late milestones'''
+        return [m for m in self.milestones if m.is_late]
+
+class Milestone(object):
+    '''Represents a milestone in Basecamp'''
+    def __init__(self, node):
+        self.id = int(node.findtext("id"))
+        self.title = node.findtext("title")
+        self._deadline = node.findtext("deadline")
+        self._completed = node.findtext("completed")
+
+    def __cmp__(self, other):
+        return cmp(self.deadline, other.deadline)
+
+    @property
+    def is_late(self):
+        if self.completed: return False
+        if self.deadline < datetime.date.today(): return True
+
+    @property
+    def completed(self):
+        if self._completed.lower() in ["true", "1", "yes"]:
+            return True
+        return False
+
+    @property
+    def deadline(self):
+        year = int(self._deadline[0:4])
+        month = int(self._deadline[5:7])
+        day = int(self._deadline[8:10])
+
+        return datetime.date(year=year, month=month, day=day)
 
 class Comment(object):
     '''Represents a comment on a message in Basecamp'''

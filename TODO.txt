@@ -1,11 +1,12 @@
 * A project should know about Backlogs and the number of items across all the backlogs
 * A project should be able to report on the upcoming 3 milestones
 * A project should be able to report on the previous 3 milestones
-
+* Extract common logic across Basecamp models into base class
 
 == DONE ==
 * A project should be able to report the date of the most recent message
 * A project should be able to report the date of the most recent comment
+* A project should be able to list the number of late milestones
 
 == API doesn't support ==
 * A project should be able to report on its description

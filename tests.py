@@ -18,6 +18,9 @@ class ProjectTests(unittest.TestCase):
         self.assertEqual("This is the latest comment",
                          self.project.comments[0].body)
 
+    def test_late_milestones(self):
+        self.assertEqual(3, len(self.project.late_milestones))
+
 def main():
     unittest.main()
 
