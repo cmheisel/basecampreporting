@@ -21,6 +21,9 @@ class ProjectTests(unittest.TestCase):
     def test_late_milestones(self):
         self.assertEqual(3, len(self.project.late_milestones))
 
+    def test_upcoming_milestones(self):
+        self.assertEqual(3, len(self.project.upcoming_milestones))
+
 def main():
     unittest.main()
 

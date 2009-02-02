@@ -54,6 +54,10 @@ class Project(object):
         '''Array of all late milestones'''
         return [m for m in self.milestones if m.is_late]
 
+    @property
+    def upcoming_milestones(self):
+        return [m for m in self.milestones if m.is_upcoming]
+
 class Milestone(object):
     '''Represents a milestone in Basecamp'''
     def __init__(self, node):
@@ -64,6 +68,10 @@ class Milestone(object):
 
     def __cmp__(self, other):
         return cmp(self.deadline, other.deadline)
+
+    @property
+    def is_upcoming(self):
+        if self.deadline >= datetime.date.today(): return True
 
     @property
     def is_late(self):
