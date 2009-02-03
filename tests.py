@@ -33,6 +33,9 @@ class ProjectTests(unittest.TestCase):
         self.assertEqual(3, self.project.backlogs['Product backlog'].uncompleted_count)
         self.assertEqual(2, self.project.backlogs['Defect backlog'].uncompleted_count)
         self.assertEqual(5, self.project.backlogged_count)
+
+    def test_sprints(self):
+        self.assertEqual(1, self.project.sprint_list_current.sprint_number)
         
 def main():
     unittest.main()

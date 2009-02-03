@@ -1,4 +1,5 @@
 import datetime
+import re
 
 try:
     import cElementTree as ElementTree
@@ -86,6 +87,15 @@ class Project(object):
         for alist in self.backlogs.values(): backlogged += alist.uncompleted_count
         return backlogged
 
+    @property
+    def sprint_list_current(self):
+        unfinished_sprints = [tdlist for tdlist in self.todo_lists.values() if tdlist.is_sprint and tdlist.uncompleted_count != 0 ]
+        unfinished_sprints.sort()
+        try:
+            return unfinished_sprints[0]
+        except IndexError:
+            return None
+
 class ToDoList(object):
     '''Represents a ToDo list in Basecamp'''
     def __init__(self, node):
@@ -110,6 +120,17 @@ class ToDoList(object):
     def is_backlog(self):
         if 'backlog' in self.name.lower(): return True
         return False
+
+    sprint_number_pattern = re.compile('(Sprint|sprint) (?P<sprint_number>[\d+])')
+    @property
+    def sprint_number(self):
+        result = self.sprint_number_pattern.search(self.name)
+        return int(result.group('sprint_number'))
+
+    def cmp(self, other):
+        if self.is_sprint and other.is_sprint:
+            return cmp(self.sprint_number, other.sprint_number)
+        return cmp(self.name, other.name)
 
 class Milestone(object):
     '''Represents a milestone in Basecamp'''
