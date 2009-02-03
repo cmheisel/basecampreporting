@@ -16,6 +16,27 @@ class Project(object):
         self.bc = Basecamp(url, username, password)
         self.id = id
         self.cache = {}
+        self._get_project_info()
+
+    def _get_project_info(self):
+        project_xml = self.bc._request("/projects/%s.xml" % self.id)
+        node = ElementTree.fromstring(project_xml)
+        self.name = node.findtext("name")
+        self.status = node.findtext("status")
+        self._last_changed_on = node.findtext("last-changed-on")
+
+    @property
+    def last_changed_on(self):
+        year = int(self._last_changed_on[0:4])
+        month = int(self._last_changed_on[5:7])
+        day = int(self._last_changed_on[8:10])
+        hour = int(self._last_changed_on[11:13])
+        minute = int(self._last_changed_on[14:16])
+        second = int(self._last_changed_on[17:19])
+
+        return datetime.datetime(year=year, month=month, day=day,
+                                 hour=hour, minute=minute, second=second)
+
 
     @property
     def messages(self):

@@ -36,6 +36,9 @@ class ProjectTests(unittest.TestCase):
 
     def test_sprints(self):
         self.assertEqual(1, self.project.sprint_list_current.sprint_number)
+
+    def test_project_title(self):
+        self.assertEqual("API Testing Project", self.project.name)
         
 def main():
     unittest.main()
