@@ -220,7 +220,19 @@ class Message(object):
     def __init__(self, message_element):
         self.id = int(message_element.findtext("id"))
         self.title = message_element.findtext("title")
-        self.posted_on = message_element.findtext("posted-on")
+        self._posted_on = message_element.findtext("posted-on")
+
+    @property
+    def posted_on(self):
+        year = int(self._posted_on[0:4])
+        month = int(self._posted_on[5:7])
+        day = int(self._posted_on[8:10])
+        hour = int(self._posted_on[11:13])
+        minute = int(self._posted_on[14:16])
+        second = int(self._posted_on[17:19])
+
+        return datetime.datetime(year=year, month=month, day=day,
+                                 hour=hour, minute=minute, second=second)
 
 if __name__ == "__main__":
     from tests import *
