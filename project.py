@@ -62,6 +62,55 @@ class Project(object):
     def previous_milestones(self):
         return [m for m in self.milestones if m.is_previous]
 
+    @property
+    def todo_lists(self):
+        todo_lists_xml = self.bc.todo_lists(self.id)
+        todo_lists = {}
+        for node in ElementTree.fromstring(todo_lists_xml).findall("todo-list"):
+            the_list = ToDoList(node)
+            todo_lists[the_list.name] = the_list
+        return todo_lists
+
+    @property
+    def backlogs(self):
+        backlogs = {}
+        lists = [tdlist for tdlist in self.todo_lists.values() if tdlist.is_backlog]
+        for alist in lists:
+            backlogs[alist.name] = alist
+            
+        return backlogs
+
+    @property
+    def backlogged_count(self):
+        backlogged = 0
+        for alist in self.backlogs.values(): backlogged += alist.uncompleted_count
+        return backlogged
+
+class ToDoList(object):
+    '''Represents a ToDo list in Basecamp'''
+    def __init__(self, node):
+        self.id = int(node.findtext("id"))
+        self.name = node.findtext("name")
+        self.project_id = int(node.findtext("project-id"))
+        self._complete = node.findtext("complete")
+        self.completed_count = int(node.findtext("completed-count"))
+        self.uncompleted_count = int(node.findtext("uncompleted-count"))
+
+    @property
+    def is_complete(self):
+        if self._complete.lower() in ['true', 'yes', 'y', 't', 1]: return True
+        return False
+
+    @property
+    def is_sprint(self):
+        if 'sprint' in self.name.lower(): return True
+        return False
+
+    @property
+    def is_backlog(self):
+        if 'backlog' in self.name.lower(): return True
+        return False
+
 class Milestone(object):
     '''Represents a milestone in Basecamp'''
     def __init__(self, node):

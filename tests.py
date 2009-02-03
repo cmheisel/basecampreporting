@@ -27,6 +27,13 @@ class ProjectTests(unittest.TestCase):
     def test_previous_milestones(self):
         self.assertEqual(6, len(self.project.previous_milestones))
 
+    def test_backlogs(self):
+        self.assertEqual(2, len(self.project.backlogs))
+
+        self.assertEqual(3, self.project.backlogs['Product backlog'].uncompleted_count)
+        self.assertEqual(2, self.project.backlogs['Defect backlog'].uncompleted_count)
+        self.assertEqual(5, self.project.backlogged_count)
+        
 def main():
     unittest.main()
 
