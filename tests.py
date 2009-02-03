@@ -35,7 +35,13 @@ class ProjectTests(unittest.TestCase):
         self.assertEqual(5, self.project.backlogged_count)
 
     def test_sprints(self):
-        self.assertEqual(1, self.project.sprint_list_current.sprint_number)
+        expected = [0, 1, 2]
+        actual = [sprint.sprint_number for sprint in self.project.sprints]
+        self.assertEqual(expected, actual)
+        
+        self.assertEqual(1, self.project.current_sprint.sprint_number)
+        self.assertEqual("Sprint 1", self.project.current_sprint.name)
+        self.assertEqual(1, len(self.project.upcoming_sprints))
 
     def test_project_title(self):
         self.assertEqual("API Testing Project", self.project.name)

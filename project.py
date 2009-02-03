@@ -109,13 +109,23 @@ class Project(object):
         return backlogged
 
     @property
-    def sprint_list_current(self):
-        unfinished_sprints = [tdlist for tdlist in self.todo_lists.values() if tdlist.is_sprint and tdlist.uncompleted_count != 0 ]
+    def sprints(self):
+        sprints = [tdlist for tdlist in self.todo_lists.values() if tdlist.is_sprint]
+        sprints.sort()
+        return sprints
+
+    @property
+    def current_sprint(self):
+        unfinished_sprints = [ tdlist for tdlist in self.sprints if not tdlist.is_complete ]
         unfinished_sprints.sort()
         try:
             return unfinished_sprints[0]
         except IndexError:
             return None
+
+    @property
+    def upcoming_sprints(self):
+        return [ sprint for sprint in self.sprints if not sprint.is_complete and sprint.sprint_number > self.current_sprint.sprint_number ]
 
 class ToDoList(object):
     '''Represents a ToDo list in Basecamp'''
@@ -148,7 +158,7 @@ class ToDoList(object):
         result = self.sprint_number_pattern.search(self.name)
         return int(result.group('sprint_number'))
 
-    def cmp(self, other):
+    def __cmp__(self, other):
         if self.is_sprint and other.is_sprint:
             return cmp(self.sprint_number, other.sprint_number)
         return cmp(self.name, other.name)

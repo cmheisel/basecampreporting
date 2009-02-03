@@ -9,6 +9,6 @@
 * A project should know about Backlogs and the number of items across all the backlogs
 * A project should be able to report on the sprint in progress
 * A project should be to report it's name
-
+* A project should be able to report it's upcoming sprints
 == API doesn't support ==
 * A project should be able to report on its description
