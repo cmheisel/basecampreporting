@@ -1,3 +1,4 @@
+* Build a mock for BC API to avoid network access during testing
 * Extract common logic across Basecamp models into base class
 
 == DONE ==
