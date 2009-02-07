@@ -1,6 +1,11 @@
 import unittest
 from project import Project
 
+from basecamp import Basecamp
+
+class TestBasecamp(Basecamp):
+    pass
+
 class ProjectTests(unittest.TestCase):
     def setUp(self):
         self.username = "apitest"
@@ -8,8 +13,9 @@ class ProjectTests(unittest.TestCase):
         self.url = "http://apitesting.basecamphq.com/"
         self.project_id = 2849305
 
-        self.project = Project(self.url, self.project_id, self.username, self.password)
-
+        self.project = Project(self.url, self.project_id,
+                               self.username, self.password, basecamp=TestBasecamp)
+        
     def test_latest_message(self):
         self.assertEqual("This is the newest message",
                          self.project.messages[0].title)

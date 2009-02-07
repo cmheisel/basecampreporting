@@ -12,8 +12,8 @@ from pyactiveresource import activeresource
 class Project(object):
     '''Represents a project in Basecamp.'''
 
-    def __init__(self, url, id, username, password):
-        self.bc = Basecamp(url, username, password)
+    def __init__(self, url, id, username, password, basecamp=Basecamp):
+        self.bc = basecamp(url, username, password)
         self.id = id
         self.cache = {}
         self._get_project_info()
