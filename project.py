@@ -16,17 +16,30 @@ class Project(object):
         self.bc = basecamp(url, username, password)
         self.id = id
         self.cache = {}
-        self._get_project_info()
+        self._name = ''
+        self._status = ''
+        self._last_changed_on = ''
 
     def _get_project_info(self):
         project_xml = self.bc._request("/projects/%s.xml" % self.id)
         node = ElementTree.fromstring(project_xml)
-        self.name = node.findtext("name")
-        self.status = node.findtext("status")
+        self._name = node.findtext("name")
+        self._status = node.findtext("status")
         self._last_changed_on = node.findtext("last-changed-on")
 
     @property
+    def name(self):
+        if not self._name: self._get_project_info()
+        return self._name
+
+    @property
+    def status(self):
+        if not self._status: self._get_project_info()
+        return self._status
+
+    @property
     def last_changed_on(self):
+        if not self._last_changed_on: self.get_project_info()
         year = int(self._last_changed_on[0:4])
         month = int(self._last_changed_on[5:7])
         day = int(self._last_changed_on[8:10])
