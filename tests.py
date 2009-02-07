@@ -2,9 +2,39 @@ import unittest
 from project import Project
 
 from basecamp import Basecamp
+from elementtree import ElementTree as ET
 
 class TestBasecamp(Basecamp):
-    pass
+    def __init__(self, baseURL, username, password, fixture_file=None):
+        self.__test_responses = { 'GET': {}, 'POST': {} }
+        super(TestBasecamp, self).__init__(baseURL, username, password)
+    
+    def _request(self, path, data=None):
+        try:
+            result = self.__test_request_local(path, data)
+            print "Cache hit"
+        except KeyError:
+            result = super(TestBasecamp, self)._request(path, data)
+            self.__cache_result(path, data, result)
+        return result
+
+    def __cache_result(self, path, data, result):
+        if data:
+            data = ET.tostring(data)
+            print "Cache miss: POST %s\n\t%s\n" % (path, data)
+            if not self.__test_responses['POST'].has_key(path):
+                self.__test_responses['POST'][path] = {}
+            self.__test_responses['POST'][path][data] = result
+        else:
+            print "Cache miss: GET %s\n" % (path, )           
+            self.__test_responses['GET'][path] = result
+        return result
+
+    def __test_request_local(self, path, data):
+        if data:
+            data = ET.tostring(data)
+            return self.__test_responses['POST'][path][data]
+        return self.__test_responses['GET'][path]
 
 class ProjectTests(unittest.TestCase):
     def setUp(self):
