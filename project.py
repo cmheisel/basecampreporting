@@ -26,14 +26,13 @@ class BasecampObject(object):
         day = int(value[8:10])
         return datetime.date(year=year, month=month, day=day)
 
-
 class Project(BasecampObject):
     '''Represents a project in Basecamp.'''
-
     def __init__(self, url, id, username, password, basecamp=Basecamp):
         self.bc = basecamp(url, username, password)
         self.id = id
-        self.cache = {}
+        self.cache = dict(messages = [], comments = [],
+                          milestones = [], todo_lists = {})
         self._name = ''
         self._status = ''
         self._last_changed_on = ''
@@ -62,16 +61,18 @@ class Project(BasecampObject):
 
     @property
     def messages(self):
-        self.cache['messages'] = []
+        if self.cache['messages']: return self.cache['messages']
         message_xml = self.bc.message_archive(self.id)
-
+        messages = []
         for post in ElementTree.fromstring(message_xml).findall("post"):
-            self.cache['messages'].append(Message(post))
-        return self.cache['messages']        
+            messages.append(Message(post))
+        self.cache['messages'] = messages
+        return self.cache['messages']
 
     @property
     def comments(self):
-        '''Looks through the last 3 messages and finds the latest comment.'''
+        '''Looks through the last 3 messages and returns those comments.'''
+        if self.cache['comments']: return self.cache['comments']
         comments = []
         for message in self.messages[0:3]:
             comment_xml = self.bc.comments(message.id)
@@ -79,11 +80,13 @@ class Project(BasecampObject):
                 comments.append(Comment(comment_node))
         comments.sort()
         comments.reverse()
-        return comments
+        self.cache['comments'] = comments
+        return self.cache['comments']
 
     @property
     def milestones(self):
         '''Array of all milestones'''
+        if self.cache['milestones']: return self.cache['milestones']
         milestone_xml = self.bc.list_milestones(self.id)
         milestones = []
         for node in ElementTree.fromstring(milestone_xml).findall("milestone"):
@@ -91,7 +94,8 @@ class Project(BasecampObject):
 
         milestones.sort()
         milestones.reverse()
-        return milestones
+        self.cache['milestones'] = milestones
+        return self.cache['milestones']
 
     @property
     def late_milestones(self):
@@ -108,12 +112,14 @@ class Project(BasecampObject):
 
     @property
     def todo_lists(self):
+        if self.cache['todo_lists']: return self.cache['todo_lists']
         todo_lists_xml = self.bc.todo_lists(self.id)
         todo_lists = {}
         for node in ElementTree.fromstring(todo_lists_xml).findall("todo-list"):
             the_list = ToDoList(node)
             todo_lists[the_list.name] = the_list
-        return todo_lists
+        self.cache['todo_lists'] = todo_lists
+        return self.cache['todo_lists']
 
     @property
     def backlogs(self):
