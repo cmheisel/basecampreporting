@@ -7,9 +7,27 @@ except ImportError:
     from elementtree import ElementTree
 
 from basecamp import Basecamp
-from pyactiveresource import activeresource
 
-class Project(object):
+class BasecampObject(object):
+    '''Common class of Basecamp objects'''
+    def parse_datetime(self, value):
+        year = int(value[0:4])
+        month = int(value[5:7])
+        day = int(value[8:10])
+        hour = int(value[11:13])
+        minute = int(value[14:16])
+        second = int(value[17:19])
+        return datetime.datetime(year=year, month=month, day=day,
+                                 hour=hour, minute=minute, second=second)
+
+    def parse_date(self, value):
+        year = int(value[0:4])
+        month = int(value[5:7])
+        day = int(value[8:10])
+        return datetime.date(year=year, month=month, day=day)
+
+
+class Project(BasecampObject):
     '''Represents a project in Basecamp.'''
 
     def __init__(self, url, id, username, password, basecamp=Basecamp):
@@ -40,16 +58,7 @@ class Project(object):
     @property
     def last_changed_on(self):
         if not self._last_changed_on: self.get_project_info()
-        year = int(self._last_changed_on[0:4])
-        month = int(self._last_changed_on[5:7])
-        day = int(self._last_changed_on[8:10])
-        hour = int(self._last_changed_on[11:13])
-        minute = int(self._last_changed_on[14:16])
-        second = int(self._last_changed_on[17:19])
-
-        return datetime.datetime(year=year, month=month, day=day,
-                                 hour=hour, minute=minute, second=second)
-
+        return self.parse_datetime(self._last_changed_on)
 
     @property
     def messages(self):
@@ -140,7 +149,7 @@ class Project(object):
     def upcoming_sprints(self):
         return [ sprint for sprint in self.sprints if not sprint.is_complete and sprint.sprint_number > self.current_sprint.sprint_number ]
 
-class ToDoList(object):
+class ToDoList(BasecampObject):
     '''Represents a ToDo list in Basecamp'''
     def __init__(self, node):
         self.id = int(node.findtext("id"))
@@ -176,7 +185,7 @@ class ToDoList(object):
             return cmp(self.sprint_number, other.sprint_number)
         return cmp(self.name, other.name)
 
-class Milestone(object):
+class Milestone(BasecampObject):
     '''Represents a milestone in Basecamp'''
     def __init__(self, node):
         self.id = int(node.findtext("id"))
@@ -208,13 +217,9 @@ class Milestone(object):
 
     @property
     def deadline(self):
-        year = int(self._deadline[0:4])
-        month = int(self._deadline[5:7])
-        day = int(self._deadline[8:10])
+        return self.parse_date(self._deadline)
 
-        return datetime.date(year=year, month=month, day=day)
-
-class Comment(object):
+class Comment(BasecampObject):
     '''Represents a comment on a message in Basecamp'''
     def __init__(self, node):
         self.id = int(node.findtext("id"))
@@ -224,21 +229,13 @@ class Comment(object):
 
     @property
     def posted_on(self):
-        year = int(self._posted_on[0:4])
-        month = int(self._posted_on[5:7])
-        day = int(self._posted_on[8:10])
-        hour = int(self._posted_on[11:13])
-        minute = int(self._posted_on[14:16])
-        second = int(self._posted_on[17:19])
-
-        return datetime.datetime(year=year, month=month, day=day,
-                                 hour=hour, minute=minute, second=second)
+        return self.parse_datetime(self._posted_on)
 
     def __cmp__(self, other):
         value = cmp(self.posted_on, other.posted_on)
         return value
 
-class Message(object):
+class Message(BasecampObject):
     '''Represents a Message in Basecamp'''
     def __init__(self, message_element):
         self.id = int(message_element.findtext("id"))
@@ -247,15 +244,7 @@ class Message(object):
 
     @property
     def posted_on(self):
-        year = int(self._posted_on[0:4])
-        month = int(self._posted_on[5:7])
-        day = int(self._posted_on[8:10])
-        hour = int(self._posted_on[11:13])
-        minute = int(self._posted_on[14:16])
-        second = int(self._posted_on[17:19])
-
-        return datetime.datetime(year=year, month=month, day=day,
-                                 hour=hour, minute=minute, second=second)
+        return self.parse_datetime(self._posted_on)
 
 if __name__ == "__main__":
     from tests import *
