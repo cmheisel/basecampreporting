@@ -31,11 +31,18 @@ class Project(BasecampObject):
     def __init__(self, url, id, username, password, basecamp=Basecamp):
         self.bc = basecamp(url, username, password)
         self.id = id
-        self.cache = dict(messages = [], comments = [],
-                          milestones = [], todo_lists = {})
         self._name = ''
         self._status = ''
         self._last_changed_on = ''
+        self.__init_cache()
+
+    def clear_cache(self, name=None):
+        if name: self.cache[name] = None
+        else: self.__init_cache()
+    
+    def __init_cache(self):
+        self.cache = dict(messages = [], comments = [],
+                          milestones = [], todo_lists = {})        
 
     def _get_project_info(self):
         project_xml = self.bc._request("/projects/%s.xml" % self.id)
