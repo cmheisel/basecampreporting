@@ -3,12 +3,15 @@ import simplejson
 import pprint
 from elementtree import ElementTree as ET
 
-
-
 from basecamp import Basecamp
 from project import Project
 
 class TestBasecamp(Basecamp):
+    """Subclass of Basecamp which records network transactions.
+       Transactions are serialized to JSON on disk and used in lieu
+       of network usage on second and subsequent requests.
+       Basecamp class found here: http://pypi.python.org/pypi/BasecampWrapper/0.1
+       """
     def __init__(self, baseURL, username, password):
         self.__test_responses = { 'GET': {}, 'POST': {} }
         super(TestBasecamp, self).__init__(baseURL, username, password)
