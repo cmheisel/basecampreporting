@@ -1,4 +1,4 @@
-* Extract common logic across Basecamp models into base class
+* Parse Project's RSS feed to determine last updated at date
 * Automatically parse BC XML into proper python types (datetime, date, int, str)
 
 == DONE ==
@@ -12,6 +12,7 @@
 * A project should be to report it's name
 * A project should be able to report it's upcoming sprints
 * Build a mock for BC API to avoid network access during testing
+* Extract common logic across Basecamp models into base class
 
 == API doesn't support ==
 * A project should be able to report on its description
