@@ -39,10 +39,10 @@ class Project(BasecampObject):
     def clear_cache(self, name=None):
         if name: self.cache[name] = None
         else: self.__init_cache()
-    
+
     def __init_cache(self):
         self.cache = dict(messages = [], comments = [],
-                          milestones = [], todo_lists = {})        
+                          milestones = [], todo_lists = {})
 
     def _get_project_info(self):
         project_xml = self.bc._request("/projects/%s.xml" % self.id)
