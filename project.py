@@ -111,7 +111,9 @@ class Project(BasecampObject):
 
     @property
     def upcoming_milestones(self):
-        return [m for m in self.milestones if m.is_upcoming]
+        upcoming = [m for m in self.milestones if m.is_upcoming]
+        upcoming.sort()
+        return upcoming
 
     @property
     def previous_milestones(self):
