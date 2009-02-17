@@ -173,6 +173,7 @@ class ToDoList(BasecampObject):
         self._complete = node.findtext("complete")
         self.completed_count = int(node.findtext("completed-count"))
         self.uncompleted_count = int(node.findtext("uncompleted-count"))
+        self.description = node.findtext("description").strip()
 
     @property
     def is_complete(self):
