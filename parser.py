@@ -9,7 +9,7 @@ def parse_basecamp_xml(xml_object):
     if hasattr(xml_object, 'getchildren'):
         nodes = xml_object.getchildren()
     else:
-        nodes = ET.fromstring(xml_string).getchildren()
+        nodes = ET.fromstring(xml_object).getchildren()
         
     parsed = parse_tree(nodes)
     return parsed
@@ -42,7 +42,7 @@ def cast_value(text_value, type_hint):
         'integer': cast_to_integer,
         'boolean': cast_to_boolean,
     }
-    return CASTING[type_hint](text_value)
+    if text_value: return CASTING[type_hint](text_value)
 
 def cast_to_boolean(value):
     if value.lower() in ["1", "true", "yes"]: return True
@@ -67,6 +67,7 @@ def cast_to_datetime(value):
 
 def cast_to_integer(text_value):
     return int(text_value)
+
 
 if __name__ == "__main__":
     from tests.test_parser import *

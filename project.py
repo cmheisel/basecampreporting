@@ -7,12 +7,21 @@ except ImportError:
     from elementtree import ElementTree
 
 from basecamp import Basecamp
-from parser import parse_basecamp_xml
+from parser import parse_basecamp_xml, cast_to_boolean
 
 class BasecampObject(object):
     '''Common class of Basecamp objects'''
     def parse(self, node):
         return parse_basecamp_xml(node)
+
+    def set_initial_values(self, xml_element):
+        data = self.parse(xml_element)
+        for key, value in data.items():
+            try:
+                setattr(self, key, value)
+            except AttributeError:
+                print "Bad key/value: %s == %s" % (key, value)
+                raise
     
     def parse_datetime(self, value):
         year = int(value[0:4])
@@ -171,18 +180,11 @@ class Project(BasecampObject):
 class ToDoList(BasecampObject):
     '''Represents a ToDo list in Basecamp'''
     def __init__(self, node):
-        self.id = int(node.findtext("id"))
-        self.name = node.findtext("name")
-        self.project_id = int(node.findtext("project-id"))
-        self._complete = node.findtext("complete")
-        self.completed_count = int(node.findtext("completed-count"))
-        self.uncompleted_count = int(node.findtext("uncompleted-count"))
-        self.description = node.findtext("description").strip()
-
+        self.set_initial_values(node)
+        
     @property
     def is_complete(self):
-        if self._complete.lower() in ['true', 'yes', 'y', 't', 1]: return True
-        return False
+        return cast_to_boolean(self.complete)
 
     @property
     def is_sprint(self):
@@ -208,11 +210,8 @@ class ToDoList(BasecampObject):
 class Milestone(BasecampObject):
     '''Represents a milestone in Basecamp'''
     def __init__(self, node):
-        self.id = int(node.findtext("id"))
-        self.title = node.findtext("title")
-        self._deadline = node.findtext("deadline")
-        self._completed = node.findtext("completed")
-
+        self.set_initial_values(node)
+        
     def __cmp__(self, other):
         return cmp(self.deadline, other.deadline)
 
@@ -229,27 +228,10 @@ class Milestone(BasecampObject):
         if self.completed: return False
         if self.deadline < datetime.date.today(): return True
 
-    @property
-    def completed(self):
-        if self._completed.lower() in ["true", "1", "yes"]:
-            return True
-        return False
-
-    @property
-    def deadline(self):
-        return self.parse_date(self._deadline)
-
 class Comment(BasecampObject):
     '''Represents a comment on a message in Basecamp'''
     def __init__(self, node):
-        self.id = int(node.findtext("id"))
-        self.body = node.findtext("body")
-        self._posted_on = node.findtext("posted-on")
-        self.author_id = id(node.findtext("author-id"))
-
-    @property
-    def posted_on(self):
-        return self.parse_datetime(self._posted_on)
+        self.set_initial_values(node)
 
     def __cmp__(self, other):
         value = cmp(self.posted_on, other.posted_on)
@@ -258,9 +240,7 @@ class Comment(BasecampObject):
 class Message(BasecampObject):
     '''Represents a Message in Basecamp'''
     def __init__(self, message_element):
-        self._data = self.parse(message_element)
-        for key, value in self._data.items():
-            setattr(self, key, value)
+        self.set_initial_values(message_element)
 
 if __name__ == "__main__":
     from tests import *
