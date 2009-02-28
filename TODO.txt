@@ -1,4 +1,4 @@
-* Automatically parse BC XML into proper python types (datetime, date, int, str)
+
 
 == DONE ==
 * A project should be able to report the date of the most recent message
@@ -13,6 +13,7 @@
 * Build a mock for BC API to avoid network access during testing
 * Extract common logic across Basecamp models into base class
 * A project should report the last time it changed in any content type
+* Automatically parse BC XML into proper python types (datetime, date, int, str)
 
 == API doesn't support ==
 * A project should be able to report on its description

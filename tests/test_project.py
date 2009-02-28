@@ -1,10 +1,15 @@
-import unittest
-import simplejson
+import os
 import pprint
-from elementtree import ElementTree as ET
+import simplejson
+import unittest
 
-from basecamp import Basecamp
-from project import Project
+try:
+    import cElementTree as ET
+except ImportError:
+    from elementtree import ET
+
+from basecampreporting.basecamp import Basecamp
+from basecampreporting.project import Project
 
 class TestBasecamp(Basecamp):
     """Subclass of Basecamp which records network transactions.
@@ -65,18 +70,20 @@ class TestBasecamp(Basecamp):
 
 class ProjectTests(unittest.TestCase):
     def setUp(self):
-        self.username = "apitest"
-        self.password = "apitest"
-        self.url = "http://apitesting.basecamphq.com/"
+        self.username = "FAKE"
+        self.password = "FAKE"
+        self.url = "http://FAKE.basecamphq.com/"
         self.project_id = 2849305
 
         self.project = Project(self.url, self.project_id,
                                self.username, self.password, basecamp=TestBasecamp)
 
-        self.project.bc.load_test_fixtures("fixtures.recorded.json")
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        self.fixtures_path = os.path.join(base_path, ".", "fixtures", "project.recorded.json")
+        self.project.bc.load_test_fixtures(self.fixtures_path)
 
     def tearDown(self):
-        self.project.bc.save_test_fixtures("fixtures.recorded.json")
+        self.project.bc.save_test_fixtures(self.fixtures_path)
         
     def test_latest_message(self):
         self.assertEqual("This is the newest message",
