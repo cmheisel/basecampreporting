@@ -1,6 +1,7 @@
-import unittest
-import simplejson
+import os
 import pprint
+import simplejson
+import unittest
 
 try:
     import cElementTree as ET
@@ -77,10 +78,12 @@ class ProjectTests(unittest.TestCase):
         self.project = Project(self.url, self.project_id,
                                self.username, self.password, basecamp=TestBasecamp)
 
-        self.project.bc.load_test_fixtures("fixtures/project.recorded.json")
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        self.fixtures_path = os.path.join(base_path, ".", "fixtures", "project.recorded.json")
+        self.project.bc.load_test_fixtures(self.fixtures_path)
 
     def tearDown(self):
-        self.project.bc.save_test_fixtures("fixtures/project.recorded.json")
+        self.project.bc.save_test_fixtures(self.fixtures_path)
         
     def test_latest_message(self):
         self.assertEqual("This is the newest message",

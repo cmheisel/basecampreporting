@@ -7,9 +7,13 @@ except ImportError:
     from elementtree import ElementTree
 
 from basecamp import Basecamp
+from parser import parse_basecamp_xml
 
 class BasecampObject(object):
     '''Common class of Basecamp objects'''
+    def parse(self, node):
+        return parse_basecamp_xml(node)
+    
     def parse_datetime(self, value):
         year = int(value[0:4])
         month = int(value[5:7])
@@ -254,13 +258,9 @@ class Comment(BasecampObject):
 class Message(BasecampObject):
     '''Represents a Message in Basecamp'''
     def __init__(self, message_element):
-        self.id = int(message_element.findtext("id"))
-        self.title = message_element.findtext("title")
-        self._posted_on = message_element.findtext("posted-on")
-
-    @property
-    def posted_on(self):
-        return self.parse_datetime(self._posted_on)
+        self._data = self.parse(message_element)
+        for key, value in self._data.items():
+            setattr(self, key, value)
 
 if __name__ == "__main__":
     from tests import *
