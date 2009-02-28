@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <created-on type="date">2009-01-28</created-on>
+  <id type="integer">2849305</id>
+  <last-changed-on type="datetime">2009-02-03T15:03:14Z</last-changed-on>
+  <name>API Testing Project</name>
+  <status>active</status>
+  <company>
+    <id type="integer">1250808</id>
+    <name>Testing</name>
+  </company>
+</project>
