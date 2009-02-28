@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<post>
+  <attachments-count type="integer">0</attachments-count>
+  <author-id type="integer">3396975</author-id>
+  <body>This is the newest message</body>
+  <category-id type="integer">28605393</category-id>
+  <comments-count type="integer">4</comments-count>
+  <display-body>&lt;p&gt;This is the newest message&lt;/p&gt;</display-body>
+  <display-extended-body nil="true"></display-extended-body>
+  <extended-body></extended-body>
+  <id type="integer">19364228</id>
+  <milestone-id type="integer">0</milestone-id>
+  <posted-on type="datetime">2009-01-28T14:30:18Z</posted-on>
+  <private type="boolean">false</private>
+  <project-id type="integer">2849305</project-id>
+  <title>This is the newest message</title>
+  <use-textile type="boolean">true</use-textile>
+</post>
