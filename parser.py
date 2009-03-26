@@ -1,9 +1,6 @@
 import datetime
 
-try:
-    import cElementTree as ET
-except ImportError:
-    from elementtree import ET
+from basecampreporting.etree import ET
 
 def parse_basecamp_xml(xml_object):
     if hasattr(xml_object, 'getchildren'):

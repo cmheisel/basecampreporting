@@ -56,7 +56,7 @@ __date__ = '2006-05-21'
 import base64
 import urllib2
 
-import elementtree.ElementTree as ET
+from basecampreporting.etree import ET
 
 
 class Basecamp(object):

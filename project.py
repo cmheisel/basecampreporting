@@ -1,12 +1,9 @@
 import datetime
 import re
 
-try:
-    import cElementTree as ElementTree
-except ImportError:
-    from elementtree import ElementTree
+from basecampreporting.etree import ET
 
-from basecamp import Basecamp
+from basecampreporting.basecamp import Basecamp
 from parser import parse_basecamp_xml, cast_to_boolean
 
 class BasecampObject(object):
@@ -39,6 +36,7 @@ class BasecampObject(object):
         day = int(value[8:10])
         return datetime.date(year=year, month=month, day=day)
 
+
 class Project(BasecampObject):
     '''Represents a project in Basecamp.'''
     def __init__(self, url, id, username, password, basecamp=Basecamp):
@@ -59,7 +57,7 @@ class Project(BasecampObject):
 
     def _get_project_info(self):
         project_xml = self.bc._request("/projects/%s.xml" % self.id)
-        node = ElementTree.fromstring(project_xml)
+        node = ET.fromstring(project_xml)
         self._name = node.findtext("name")
         self._status = node.findtext("status")
         self._last_changed_on = node.findtext("last-changed-on")
@@ -84,7 +82,7 @@ class Project(BasecampObject):
         if self.cache['messages']: return self.cache['messages']
         message_xml = self.bc.message_archive(self.id)
         messages = []
-        for post in ElementTree.fromstring(message_xml).findall("post"):
+        for post in ET.fromstring(message_xml).findall("post"):
             messages.append(Message(post))
         self.cache['messages'] = messages
         return self.cache['messages']
@@ -96,7 +94,7 @@ class Project(BasecampObject):
         comments = []
         for message in self.messages[0:3]:
             comment_xml = self.bc.comments(message.id)
-            for comment_node in ElementTree.fromstring(comment_xml).findall("comment"):
+            for comment_node in ET.fromstring(comment_xml).findall("comment"):
                 comments.append(Comment(comment_node))
         comments.sort()
         comments.reverse()
@@ -109,7 +107,7 @@ class Project(BasecampObject):
         if self.cache['milestones']: return self.cache['milestones']
         milestone_xml = self.bc.list_milestones(self.id)
         milestones = []
-        for node in ElementTree.fromstring(milestone_xml).findall("milestone"):
+        for node in ET.fromstring(milestone_xml).findall("milestone"):
             milestones.append(Milestone(node))
 
         milestones.sort()
@@ -137,7 +135,7 @@ class Project(BasecampObject):
         if self.cache['todo_lists']: return self.cache['todo_lists']
         todo_lists_xml = self.bc.todo_lists(self.id)
         todo_lists = {}
-        for node in ElementTree.fromstring(todo_lists_xml).findall("todo-list"):
+        for node in ET.fromstring(todo_lists_xml).findall("todo-list"):
             the_list = ToDoList(node)
             todo_lists[the_list.name] = the_list
         self.cache['todo_lists'] = todo_lists
