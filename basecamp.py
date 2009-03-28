@@ -73,7 +73,7 @@ class Basecamp(object):
                 % base64.encodestring('%s:%s' % (username, password)))]
 
     def _request(self, path, data=None):
-        if isinstance(data, ET._ElementInterface):
+        if hasattr(data, 'findall'):
             data = ET.tostring(data)
         req = urllib2.Request(url=self.baseURL + path, data=data)
         return self.opener.open(req).read()
