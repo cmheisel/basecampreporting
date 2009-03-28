@@ -54,6 +54,8 @@ __date__ = '2006-05-21'
 
 
 import base64
+base64.MAXBINSIZE=1000000
+
 import urllib2
 
 from basecampreporting.etree import ET
@@ -65,12 +67,17 @@ class Basecamp(object):
         self.baseURL = baseURL
         if self.baseURL[-1] == '/':
             self.baseURL = self.baseURL[:-1]
+
         self.opener = urllib2.build_opener()
-        self.opener.addheaders = [
+
+        self.auth_string = '%s:%s' % (username, password)
+        self.encoded_auth_string = base64.encodestring(self.auth_string)
+        self.encoded_auth_string = self.encoded_auth_string.replace('\n', '')
+        self.headers = [
             ('Content-Type', 'application/xml'),
             ('Accept', 'application/xml'),
-            ('Authorization', 'Basic %s' \
-                % base64.encodestring('%s:%s' % (username, password)))]
+            ('Authorization', 'Basic %s' % self.encoded_auth_string), ]
+        self.opener.addheaders = self.headers
 
     def _request(self, path, data=None):
         if hasattr(data, 'findall'):
