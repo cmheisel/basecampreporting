@@ -4,7 +4,7 @@ import re
 from basecampreporting.etree import ET
 
 from basecampreporting.basecamp import Basecamp
-from parser import parse_basecamp_xml, cast_to_boolean
+from basecampreporting.parser import parse_basecamp_xml, cast_to_boolean
 
 class BasecampObject(object):
     '''Common class of Basecamp objects'''
@@ -241,5 +241,5 @@ class Message(BasecampObject):
         self.set_initial_values(message_element)
 
 if __name__ == "__main__":
-    from tests import *
+    from basecampreporting.tests import *
     main()
