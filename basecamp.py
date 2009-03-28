@@ -54,8 +54,6 @@ __date__ = '2006-05-21'
 
 
 import base64
-base64.MAXBINSIZE=1000000
-
 import urllib2
 
 from basecampreporting.etree import ET
@@ -72,6 +70,9 @@ class Basecamp(object):
 
         self.auth_string = '%s:%s' % (username, password)
         self.encoded_auth_string = base64.encodestring(self.auth_string)
+
+        #Python 2.5, at least on Ubuntu is adding a newline when encoding,
+        #which Basecamp chokes on and returns an HTTP 400
         self.encoded_auth_string = self.encoded_auth_string.replace('\n', '')
         self.headers = [
             ('Content-Type', 'application/xml'),
