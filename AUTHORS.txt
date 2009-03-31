@@ -1,0 +1,5 @@
+Chris Heisel - http://heisel.org
+Primary developer and architect
+
+Jochen Kupperschmidt - http://pypi.python.org/pypi/BasecampWrapper/0.1
+Author of the original low-level read/write API
