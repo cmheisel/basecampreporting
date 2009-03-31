@@ -52,6 +52,23 @@ class SerializationTests(SerializationTestHelper):
                     u'posted_on': u'2009-01-28T21:37:02'}
         self.assertSerialization(c, expected)
 
+    def test_milestone(self):
+        m = self.project.milestones[0]
+        expected = {u'completed': False,
+                    u'created_on': u'2009-01-29T21:55:43',
+                    u'creator_id': 3396975,
+                    u'deadline': u'2011-12-31T00:00:00',
+                    u'id': 8710156,
+                    u'project_id': 2849305,
+                    u'responsible_party_id': 3396975,
+                    u'responsible_party_type': u'Person',
+                    u'title': u'Future Milestone 3',
+                    u'wants_notification': False,
+                    u'is_previous': False,
+                    u'is_upcoming': True,
+                    u'is_late': False}
+        self.assertSerialization(m, expected)
+
 if __name__ == "__main__":
     import unittest
     unittest.main()

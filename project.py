@@ -30,6 +30,10 @@ class BasecampObject(object):
         for key in self._basecamp_attributes:
             object_data[key] = getattr(self, key)
 
+        if hasattr(self, '_extra_attributes'):
+            for key in self._extra_attributes:
+                object_data[key] = getattr(self, key)
+
         return json.dumps(object_data, cls=BasecampObjectEncoder)
     
     def parse_datetime(self, value):
@@ -221,6 +225,7 @@ class Milestone(BasecampObject):
     '''Represents a milestone in Basecamp'''
     def __init__(self, node):
         self.set_initial_values(node)
+        self._extra_attributes = ['is_previous', 'is_upcoming', 'is_late']
         
     def __cmp__(self, other):
         return cmp(self.deadline, other.deadline)
@@ -228,15 +233,18 @@ class Milestone(BasecampObject):
     @property
     def is_previous(self):
         if self.deadline < datetime.date.today(): return True
+        return False
 
     @property
     def is_upcoming(self):
         if self.deadline >= datetime.date.today(): return True
+        return False
 
     @property
     def is_late(self):
         if self.completed: return False
         if self.deadline < datetime.date.today(): return True
+        return False
 
 class Comment(BasecampObject):
     '''Represents a comment on a message in Basecamp'''
