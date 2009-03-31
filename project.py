@@ -2,23 +2,35 @@ import datetime
 import re
 
 from basecampreporting.etree import ET
-
+from basecampreporting.serialization import json, BasecampObjectEncoder
 from basecampreporting.basecamp import Basecamp
 from basecampreporting.parser import parse_basecamp_xml, cast_to_boolean
 
 class BasecampObject(object):
     '''Common class of Basecamp objects'''
+    def __init__(self):
+        super(self, BasecampObject).__init__()
+    
     def parse(self, node):
         return parse_basecamp_xml(node)
 
     def set_initial_values(self, xml_element):
         data = self.parse(xml_element)
+        if not hasattr(self, '_basecamp_attributes'): self._basecamp_attributes = []
         for key, value in data.items():
             try:
                 setattr(self, key, value)
+                self._basecamp_attributes.append(key)
             except AttributeError:
                 print "Bad key/value: %s == %s" % (key, value)
                 raise
+
+    def to_json(self):
+        object_data = {}
+        for key in self._basecamp_attributes:
+            object_data[key] = getattr(self, key)
+
+        return json.dumps(object_data, cls=BasecampObjectEncoder)
     
     def parse_datetime(self, value):
         year = int(value[0:4])
@@ -238,7 +250,9 @@ class Comment(BasecampObject):
 class Message(BasecampObject):
     '''Represents a Message in Basecamp'''
     def __init__(self, message_element):
+        super(BasecampObject, self).__init__()
         self.set_initial_values(message_element)
+
 
 if __name__ == "__main__":
     from basecampreporting.tests import *
