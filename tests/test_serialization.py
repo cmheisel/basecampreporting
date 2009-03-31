@@ -42,7 +42,15 @@ class SerializationTests(SerializationTestHelper):
         self.assertSerialization(m, expected)
 
     def test_comment(self):
-        pass
+        c = self.project.comments[0]
+        expected = {u'attachments_count': 0,
+                    u'author_id': 3396975,
+                    u'body': u'This is the latest comment',
+                    u'emailed_from': None,
+                    u'id': 29503849,
+                    u'post_id': 19364228,
+                    u'posted_on': u'2009-01-28T21:37:02'}
+        self.assertSerialization(c, expected)
 
 if __name__ == "__main__":
     import unittest
