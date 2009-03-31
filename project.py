@@ -195,6 +195,7 @@ class ToDoList(BasecampObject):
     '''Represents a ToDo list in Basecamp'''
     def __init__(self, node):
         self.set_initial_values(node)
+        self._extra_attributes = ['is_complete', 'is_sprint', 'is_backlog']
         
     @property
     def is_complete(self):

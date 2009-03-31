@@ -69,6 +69,24 @@ class SerializationTests(SerializationTestHelper):
                     u'is_late': False}
         self.assertSerialization(m, expected)
 
+    def test_todolist(self):
+        t = self.project.todo_lists[self.project.todo_lists.keys()[0]]
+        expected = {u'complete': u'false',
+                    u'completed_count': 0,
+                    u'description': u'Bugs and errors that need to be fixed',
+                    u'id': 5390843,
+                    u'milestone_id': None,
+                    u'name': u'Defect backlog',
+                    u'position': 3,
+                    u'private': False,
+                    u'project_id': 2849305,
+                    u'tracked': False,
+                    u'uncompleted_count': 2,
+                    u'is_complete': False,
+                    u'is_sprint': False,
+                    u'is_backlog': True}
+        self.assertSerialization(t, expected)
+
 if __name__ == "__main__":
     import unittest
     unittest.main()
