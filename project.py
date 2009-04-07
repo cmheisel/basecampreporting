@@ -2,23 +2,39 @@ import datetime
 import re
 
 from basecampreporting.etree import ET
-
+from basecampreporting.serialization import json, BasecampObjectEncoder
 from basecampreporting.basecamp import Basecamp
 from basecampreporting.parser import parse_basecamp_xml, cast_to_boolean
 
 class BasecampObject(object):
     '''Common class of Basecamp objects'''
+    def __init__(self):
+        super(self, BasecampObject).__init__()
+    
     def parse(self, node):
         return parse_basecamp_xml(node)
 
     def set_initial_values(self, xml_element):
         data = self.parse(xml_element)
+        if not hasattr(self, '_basecamp_attributes'): self._basecamp_attributes = []
         for key, value in data.items():
             try:
                 setattr(self, key, value)
+                self._basecamp_attributes.append(key)
             except AttributeError:
                 print "Bad key/value: %s == %s" % (key, value)
                 raise
+
+    def to_json(self):
+        object_data = {}
+        for key in self._basecamp_attributes:
+            object_data[key] = getattr(self, key)
+
+        if hasattr(self, '_extra_attributes'):
+            for key in self._extra_attributes:
+                object_data[key] = getattr(self, key)
+
+        return json.dumps(object_data, cls=BasecampObjectEncoder)
     
     def parse_datetime(self, value):
         year = int(value[0:4])
@@ -46,6 +62,8 @@ class Project(BasecampObject):
         self._status = ''
         self._last_changed_on = ''
         self.__init_cache()
+        self._basecamp_attributes = []
+        self._extra_attributes = ['name', 'status', 'last_changed_on', 'messages', 'comments', 'milestones', 'late_milestones', 'previous_milestones', 'backlogged_count', 'sprints', 'current_sprint', 'upcoming_sprints', 'todo_lists', 'backlogs']
 
     def clear_cache(self, name=None):
         if name: self.cache[name] = None
@@ -179,6 +197,7 @@ class ToDoList(BasecampObject):
     '''Represents a ToDo list in Basecamp'''
     def __init__(self, node):
         self.set_initial_values(node)
+        self._extra_attributes = ['is_complete', 'is_sprint', 'is_backlog']
         
     @property
     def is_complete(self):
@@ -209,6 +228,7 @@ class Milestone(BasecampObject):
     '''Represents a milestone in Basecamp'''
     def __init__(self, node):
         self.set_initial_values(node)
+        self._extra_attributes = ['is_previous', 'is_upcoming', 'is_late']
         
     def __cmp__(self, other):
         return cmp(self.deadline, other.deadline)
@@ -216,15 +236,18 @@ class Milestone(BasecampObject):
     @property
     def is_previous(self):
         if self.deadline < datetime.date.today(): return True
+        return False
 
     @property
     def is_upcoming(self):
         if self.deadline >= datetime.date.today(): return True
+        return False
 
     @property
     def is_late(self):
         if self.completed: return False
         if self.deadline < datetime.date.today(): return True
+        return False
 
 class Comment(BasecampObject):
     '''Represents a comment on a message in Basecamp'''
@@ -238,7 +261,9 @@ class Comment(BasecampObject):
 class Message(BasecampObject):
     '''Represents a Message in Basecamp'''
     def __init__(self, message_element):
+        super(BasecampObject, self).__init__()
         self.set_initial_values(message_element)
+
 
 if __name__ == "__main__":
     from basecampreporting.tests import *
