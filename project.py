@@ -34,7 +34,7 @@ class BasecampObject(object):
             for key in self._extra_attributes:
                 object_data[key] = getattr(self, key)
 
-        return json.dumps(object_data, cls=BasecampObjectEncoder)
+        return json.dumps(object_data, cls=BasecampObjectEncoder, indent=True)
     
     def parse_datetime(self, value):
         year = int(value[0:4])

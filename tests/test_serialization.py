@@ -100,15 +100,15 @@ class SerializationTests(SerializationTestHelper):
             u'name': self.project.name,
             u'status': self.project.status,
             u'last_changed_on': '2009-02-03T15:03:14',
-            u'messages': [ m.to_json() for m in self.project.messages ],
-            u'comments': [ c.to_json() for c in self.project.comments ],
-            u'milestones': [ m.to_json() for m in self.project.milestones ],
-            u'late_milestones': [ m.to_json() for m in self.project.late_milestones ],
-            u'previous_milestones': [ m.to_json() for m in self.project.previous_milestones ],
+            u'messages': [ json.loads(m.to_json()) for m in self.project.messages ],
+            u'comments': [ json.loads(c.to_json()) for c in self.project.comments ],
+            u'milestones': [ json.loads(m.to_json()) for m in self.project.milestones ],
+            u'late_milestones': [ json.loads(m.to_json()) for m in self.project.late_milestones ],
+            u'previous_milestones': [ json.loads(m.to_json()) for m in self.project.previous_milestones ],
             u'backlogged_count': self.project.backlogged_count,
-            u'sprints': [ s.to_json() for s in self.project.sprints ],
-            u'current_sprint': self.project.current_sprint.to_json(),
-            u'upcoming_sprints': [ s.to_json() for s in self.project.upcoming_sprints ],
+            u'sprints': [ json.loads(s.to_json()) for s in self.project.sprints ],
+            u'current_sprint': json.loads(self.project.current_sprint.to_json()),
+            u'upcoming_sprints': [ json.loads(s.to_json()) for s in self.project.upcoming_sprints ],
         }
 
         todo_list_keys = self.project.todo_lists.keys()
@@ -116,14 +116,14 @@ class SerializationTests(SerializationTestHelper):
 
         expected[u'todo_lists'] = {}
         for k in todo_list_keys:
-            expected[u'todo_lists'][k] = self.project.todo_lists[k].to_json()
+            expected[u'todo_lists'][k] = json.loads(self.project.todo_lists[k].to_json())
         
         backlog_keys = self.project.backlogs.keys()
         backlog_keys.sort()
 
         expected[u'backlogs'] = {}
         for k in backlog_keys:
-            expected[u'backlogs'][k] = self.project.backlogs[k].to_json()
+            expected[u'backlogs'][k] = json.loads(self.project.backlogs[k].to_json())
 
         return expected
 
