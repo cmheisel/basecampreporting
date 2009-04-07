@@ -92,40 +92,38 @@ class SerializationTests(SerializationTestHelper):
 
     def test_project(self):
         p = self.project
-        expected = self.generated_expected_project()
+        expected = self.generate_expected_project()
         self.assertSerialization(p, expected)
 
-    def generated_expected_project(self, limit_relations=None):
+    def generate_expected_project(self):
         expected = {
             u'name': self.project.name,
             u'status': self.project.status,
             u'last_changed_on': '2009-02-03T15:03:14',
-            u'messages': [ m.to_json(limit_relations) for m in self.project.messages[:limit_relations] ],
-            u'comments': [ c.to_json(limit_relations) for c in self.project.comments[:limit_relations] ],
-            u'milestones': [ m.to_json(limit_relations) for m in self.project.milestones[:limit_relations] ],
-            u'late_milestones': [ m.to_json(limit_relations) for m in self.project.late_milestones[:limit_relations] ],
-            u'previous_milestones': [ m.to_json(limit_relations) for m in self.project.previous_milestones[:limit_relations] ],
+            u'messages': [ m.to_json() for m in self.project.messages ],
+            u'comments': [ c.to_json() for c in self.project.comments ],
+            u'milestones': [ m.to_json() for m in self.project.milestones ],
+            u'late_milestones': [ m.to_json() for m in self.project.late_milestones ],
+            u'previous_milestones': [ m.to_json() for m in self.project.previous_milestones ],
             u'backlogged_count': self.project.backlogged_count,
-            u'sprints': [ s.to_json(limit_relations) for s in self.project.sprints[:limit_relations] ],
-            u'current_sprint': self.project.current_sprint.to_json(limit_relations),
-            u'upcoming_sprints': [ s.to_json(limit_relations) for s in self.project.upcoming_sprints[:limit_relations] ],
+            u'sprints': [ s.to_json() for s in self.project.sprints ],
+            u'current_sprint': self.project.current_sprint.to_json(),
+            u'upcoming_sprints': [ s.to_json() for s in self.project.upcoming_sprints ],
         }
 
         todo_list_keys = self.project.todo_lists.keys()
         todo_list_keys.sort()
-        todo_list_keys = todo_list_keys[:limit_relations]
 
         expected[u'todo_lists'] = {}
         for k in todo_list_keys:
-            expected[u'todo_lists'][k] = self.project.todo_lists[k].to_json(limit_relations)
+            expected[u'todo_lists'][k] = self.project.todo_lists[k].to_json()
         
         backlog_keys = self.project.backlogs.keys()
         backlog_keys.sort()
-        backlog_keys = backlog_keys[:limit_relations]
 
         expected[u'backlogs'] = {}
         for k in backlog_keys:
-            expected[u'backlogs'][k] = self.project.backlogs[k].to_json(limit_relations)
+            expected[u'backlogs'][k] = self.project.backlogs[k].to_json()
 
         return expected
 

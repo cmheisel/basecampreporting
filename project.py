@@ -25,7 +25,7 @@ class BasecampObject(object):
                 print "Bad key/value: %s == %s" % (key, value)
                 raise
 
-    def to_json(self, limit_relations=-1):
+    def to_json(self):
         object_data = {}
         for key in self._basecamp_attributes:
             object_data[key] = getattr(self, key)
