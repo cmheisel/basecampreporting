@@ -25,7 +25,7 @@ class BasecampObject(object):
                 print "Bad key/value: %s == %s" % (key, value)
                 raise
 
-    def to_json(self):
+    def to_json(self, limit_relations=-1):
         object_data = {}
         for key in self._basecamp_attributes:
             object_data[key] = getattr(self, key)
@@ -62,6 +62,8 @@ class Project(BasecampObject):
         self._status = ''
         self._last_changed_on = ''
         self.__init_cache()
+        self._basecamp_attributes = []
+        self._extra_attributes = ['name', 'status', 'last_changed_on', 'messages', 'comments', 'milestones', 'late_milestones', 'previous_milestones', 'backlogged_count', 'sprints', 'current_sprint', 'upcoming_sprints', 'todo_lists', 'backlogs']
 
     def clear_cache(self, name=None):
         if name: self.cache[name] = None

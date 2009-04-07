@@ -26,8 +26,11 @@ class SerializationTestHelper(unittest.TestCase):
         as_json = o.to_json()
         from_json = json.loads(as_json)
 
-        msg = "Unequal data structures!\nExpected:\n%s\n\nActual:\n%s" % (pprint.pformat(expected), pprint.pformat(from_json))
-        self.assertEqual(expected, from_json, msg)
+        for key, value in expected.items():
+            msg = "Key %s doesn't match.\nExpected:\n%s\n\nActual:\n%s" % (key, pprint.pformat(value), pprint.pformat(from_json[key]))
+            self.assertEqual(value, from_json[key], msg)
+#        msg = "Unequal data structures!\nExpected:\n%s\n\nActual:\n%s" % (pprint.pformat(expected), pprint.pformat(from_json))
+#        self.assertEqual(expected, from_json, msg)
 
 class SerializationTests(SerializationTestHelper):
     def test_message(self):
@@ -86,6 +89,45 @@ class SerializationTests(SerializationTestHelper):
                     u'is_sprint': False,
                     u'is_backlog': True}
         self.assertSerialization(t, expected)
+
+    def test_project(self):
+        p = self.project
+        expected = self.generated_expected_project()
+        self.assertSerialization(p, expected)
+
+    def generated_expected_project(self, limit_relations=None):
+        expected = {
+            u'name': self.project.name,
+            u'status': self.project.status,
+            u'last_changed_on': '2009-02-03T15:03:14',
+            u'messages': [ m.to_json(limit_relations) for m in self.project.messages[:limit_relations] ],
+            u'comments': [ c.to_json(limit_relations) for c in self.project.comments[:limit_relations] ],
+            u'milestones': [ m.to_json(limit_relations) for m in self.project.milestones[:limit_relations] ],
+            u'late_milestones': [ m.to_json(limit_relations) for m in self.project.late_milestones[:limit_relations] ],
+            u'previous_milestones': [ m.to_json(limit_relations) for m in self.project.previous_milestones[:limit_relations] ],
+            u'backlogged_count': self.project.backlogged_count,
+            u'sprints': [ s.to_json(limit_relations) for s in self.project.sprints[:limit_relations] ],
+            u'current_sprint': self.project.current_sprint.to_json(limit_relations),
+            u'upcoming_sprints': [ s.to_json(limit_relations) for s in self.project.upcoming_sprints[:limit_relations] ],
+        }
+
+        todo_list_keys = self.project.todo_lists.keys()
+        todo_list_keys.sort()
+        todo_list_keys = todo_list_keys[:limit_relations]
+
+        expected[u'todo_lists'] = {}
+        for k in todo_list_keys:
+            expected[u'todo_lists'][k] = self.project.todo_lists[k].to_json(limit_relations)
+        
+        backlog_keys = self.project.backlogs.keys()
+        backlog_keys.sort()
+        backlog_keys = backlog_keys[:limit_relations]
+
+        expected[u'backlogs'] = {}
+        for k in backlog_keys:
+            expected[u'backlogs'][k] = self.project.backlogs[k].to_json(limit_relations)
+
+        return expected
 
 if __name__ == "__main__":
     import unittest
