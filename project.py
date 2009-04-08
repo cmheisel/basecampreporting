@@ -26,32 +26,22 @@ class BasecampObject(object):
                 raise
 
     def to_dict(self):
-        object_data = {}
-        for key in self._basecamp_attributes:
-            object_data[key] = getattr(self, key)
+        try:
+            attribute_names = self._basecamp_attributes + self._extra_attributes
+        except AttributeError:
+            attribute_names = self._basecamp_attributes
+            
+        attributes = ((key, getattr(self,key)) for key in attribute_names)
+        return dict(((key, self.dictify(value)) for key, value in attributes))
 
-        if hasattr(self, '_extra_attributes'):
-            for key in self._extra_attributes:
-                object_data[key] = getattr(self, key)
-
-
-        for key, value in object_data.items():
-            if hasattr(value, 'to_dict'): object_data[key] = value.to_dict()
-
-            if hasattr(value, 'append'):
-                object_data[key] = [ o.to_dict() for o in value if hasattr(o, 'to_dict') ]
-
-            if hasattr(value, 'keys'):
-                new_value = {}
-                for key2, value2 in value.items():
-                    if hasattr(value2, 'to_dict'):
-                        new_value[key2] = value2.to_dict()
-                    else:
-                        new_value[key2] = value2
-                object_data[key] = new_value
-                    
-
-        return object_data
+    def dictify(self, value):
+        if hasattr(value, 'to_dict'):
+            return value.to_dict()
+        elif hasattr(value, 'append'):
+            return [self.dictify(v) for v in value]
+        elif hasattr(value, 'keys'):
+            return dict(((key, self.dictify(v)) for key, v in value.iteritems()))
+        return value
 
     def to_json(self):
         return json.dumps(self.to_dict(), cls=BasecampObjectEncoder, indent=True)
