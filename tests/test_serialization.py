@@ -22,6 +22,14 @@ class SerializationTestHelper(unittest.TestCase):
 
         self.project.bc.load_test_fixtures(self.fixtures_path)
 
+    def assertDict(self, o, expected):
+        for key, value in expected.items():
+            msg = "Key %s doesn't match.\nExpected:\n%s\n\nActual:\n%s" % (key, pprint.pformat(value), pprint.pformat(o.to_dict()[key]))
+            self.assertEqual(value, o.to_dict()[key], msg)
+        #msg = "Unequal data structures!\nExpected:\n%s\n\nActual:\n%s" % (pprint.pformat(expected), pprint.pformat(o.to_dict()))
+        #self.assertEqual(expected, o.to_dict(), msg)
+
+
     def assertSerialization(self, o, expected):
         as_json = o.to_json()
         from_json = json.loads(as_json)
@@ -29,8 +37,6 @@ class SerializationTestHelper(unittest.TestCase):
         for key, value in expected.items():
             msg = "Key %s doesn't match.\nExpected:\n%s\n\nActual:\n%s" % (key, pprint.pformat(value), pprint.pformat(from_json[key]))
             self.assertEqual(value, from_json[key], msg)
-#        msg = "Unequal data structures!\nExpected:\n%s\n\nActual:\n%s" % (pprint.pformat(expected), pprint.pformat(from_json))
-#        self.assertEqual(expected, from_json, msg)
 
 class SerializationTests(SerializationTestHelper):
     def test_message(self):
@@ -44,6 +50,9 @@ class SerializationTests(SerializationTestHelper):
         }
         self.assertSerialization(m, expected)
 
+        expected[u'posted_on'] = datetime.datetime(2009, 1, 28, 14, 30, 18)
+        self.assertDict(m, expected)
+
     def test_comment(self):
         c = self.project.comments[0]
         expected = {u'attachments_count': 0,
@@ -54,6 +63,9 @@ class SerializationTests(SerializationTestHelper):
                     u'post_id': 19364228,
                     u'posted_on': u'2009-01-28T21:37:02'}
         self.assertSerialization(c, expected)
+
+        expected[u'posted_on'] = datetime.datetime(2009, 1, 28, 21, 37, 2)
+        self.assertDict(c, expected)
 
     def test_milestone(self):
         m = self.project.milestones[0]
@@ -72,6 +84,10 @@ class SerializationTests(SerializationTestHelper):
                     u'is_late': False}
         self.assertSerialization(m, expected)
 
+        expected[u'created_on'] = datetime.datetime(2009, 1, 29, 21, 55, 43)
+        expected[u'deadline'] = datetime.date(2011, 12, 31)
+        self.assertDict(m, expected)
+
     def test_todolist(self):
         t = self.project.todo_lists[self.project.todo_lists.keys()[0]]
         expected = {u'complete': u'false',
@@ -89,11 +105,45 @@ class SerializationTests(SerializationTestHelper):
                     u'is_sprint': False,
                     u'is_backlog': True}
         self.assertSerialization(t, expected)
-
+        self.assertDict(t, expected)
+            
     def test_project(self):
         p = self.project
         expected = self.generate_expected_project()
         self.assertSerialization(p, expected)
+
+    def test_project_dict(self):
+        p = self.project
+        expected = self.generate_expected_project_dict()
+        self.assertDict(p, expected)
+
+    def generate_expected_project_dict(self):
+        expected = {
+            u'name': self.project.name,
+            u'status': self.project.status,
+            u'last_changed_on': datetime.datetime(2009, 2, 3, 15, 3, 14),
+            u'messages': [ m.to_dict() for m in self.project.messages ],
+            u'comments': [ c.to_dict() for c in self.project.comments ],
+            u'milestones': [ m.to_dict() for m in self.project.milestones ],
+            u'late_milestones': [ m.to_dict() for m in self.project.late_milestones ],
+            u'previous_milestones': [ m.to_dict() for m in self.project.previous_milestones ],
+            u'backlogged_count': self.project.backlogged_count,
+            u'sprints': [ s.to_dict() for s in self.project.sprints ],
+            u'current_sprint': json.loads(self.project.current_sprint.to_json()),
+            u'upcoming_sprints': [ s.to_dict() for s in self.project.upcoming_sprints ],
+        }
+
+        todo_list_keys = self.project.todo_lists.keys()
+        expected[u'todo_lists'] = {}
+        for k in todo_list_keys:
+            expected[u'todo_lists'][k] = self.project.todo_lists[k].to_dict()
+        
+        backlog_keys = self.project.backlogs.keys()
+        expected[u'backlogs'] = {}
+        for k in backlog_keys:
+            expected[u'backlogs'][k] = self.project.backlogs[k].to_dict()
+
+        return expected
 
     def generate_expected_project(self):
         expected = {
