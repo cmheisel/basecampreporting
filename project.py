@@ -26,7 +26,7 @@ class BasecampObject(object):
                 raise
 
     def to_dict(self):
-        attribute_names = self._basecamp_attributes + getattr(self, _extra_attributes, [])
+        attribute_names = self._basecamp_attributes + getattr(self, "_extra_attributes", [])
         attributes = ((key, getattr(self,key)) for key in attribute_names)
         return dict(((key, self.dictify(value)) for key, value in attributes))
 
