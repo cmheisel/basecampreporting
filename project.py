@@ -98,7 +98,7 @@ class Project(BasecampObject):
 
     @property
     def last_changed_on(self):
-        if not self._last_changed_on: self.get_project_info()
+        if not self._last_changed_on: self._get_project_info()
         return self.parse_datetime(self._last_changed_on)
 
     @property
