@@ -177,6 +177,9 @@ class SerializationTests(SerializationTestHelper):
 
         return expected
 
+def test_suite():
+    return unittest.makeSuite(SerializationTests)
+
 if __name__ == "__main__":
     import unittest
     unittest.main()
