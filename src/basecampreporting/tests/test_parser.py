@@ -58,7 +58,8 @@ class ParserTests(unittest.TestCase):
         actual = self.parse(self.fixture('message.xml'))
         self.assertEqual(expected, actual)
             
-        
+def test_suite():
+    return unittest.makeSuite(ParserTests)
         
 if __name__ == "__main__":
     unittest.main()

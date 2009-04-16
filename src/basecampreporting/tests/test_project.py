@@ -59,6 +59,9 @@ class ProjectTests(unittest.TestCase):
 
     def test_project_title(self):
         self.assertEqual("API Testing Project", self.project.name)
+
+def test_suite():
+    return unittest.makeSuite(ProjectTests)
         
 def main():
     unittest.main()
