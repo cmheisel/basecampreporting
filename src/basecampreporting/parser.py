@@ -38,6 +38,7 @@ def cast_value(text_value, type_hint):
         'datetime': cast_to_datetime,
         'integer': cast_to_integer,
         'boolean': cast_to_boolean,
+        'float': cast_to_float,
     }
     if text_value: return CASTING[type_hint](text_value)
 
@@ -64,6 +65,9 @@ def cast_to_datetime(value):
 
 def cast_to_integer(text_value):
     return int(text_value)
+    
+def cast_to_float(text_value):
+    return float(text_value)
 
 
 if __name__ == "__main__":

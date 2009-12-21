@@ -77,7 +77,7 @@ class Project(BasecampObject):
 
     def __init_cache(self):
         self.cache = dict(messages = [], comments = [],
-                          milestones = [], todo_lists = {})
+                          milestones = [], todo_lists = {}, time_entries = [])
 
     def _get_project_info(self):
         project_xml = self.bc._request("/projects/%s.xml" % self.id)
@@ -110,6 +110,22 @@ class Project(BasecampObject):
             messages.append(Message(post))
         self.cache['messages'] = messages
         return self.cache['messages']
+    
+    @property
+    def time_entries(self, start_date=None, end_date=None):
+        '''Array of all time entries'''
+        if self.cache['time_entries']: return self.cache['time_entries']
+        if not start_date:
+            start_date = datetime.date(1900, 1, 1)
+        if not end_date:
+            end_date = datetime.date.today()
+        time_entry_xml = self.bc.list_time_entries(self.id, start_date, end_date)
+        time_entries = []
+        for entry in ET.fromstring(time_entry_xml).findall("time-entry"):
+            time_entries.append(TimeEntry(entry))
+        self.cache['time_entries'] = time_entries
+        return self.cache['time_entries']
+            
 
     @property
     def comments(self):
@@ -270,6 +286,10 @@ class Message(BasecampObject):
         super(BasecampObject, self).__init__()
         self.set_initial_values(message_element)
 
+class TimeEntry(BasecampObject):
+    '''Represents an Time Entry in Basecamp'''
+    def __init__(self, node):
+        self.set_initial_values(node)
 
 if __name__ == "__main__":
     from basecampreporting.tests import *

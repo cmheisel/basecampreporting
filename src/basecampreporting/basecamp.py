@@ -545,3 +545,16 @@ class Basecamp(object):
         """
         path = '/milestones/delete/%u' % milestone_id
         return self._request(path)
+        
+    # ---------------------------------------------------------------- #
+    # Time Tracking
+    
+    def list_time_entries(self, project_id, start_date, end_date):
+        """
+        This lets you query the time tracking report for a project. You can
+        either return all time logs, or filter based on date.
+        """
+        path = '/time/report/0/%s/%s/p%s' % (start_date.strftime('%Y%m%d'),
+                                             end_date.strftime('%Y%m%d'),
+                                             project_id)
+        return self._request(path)
