@@ -121,6 +121,13 @@ class Basecamp(object):
         path = '/contacts/people/%u' % company_id
         return self._request(path)
 
+    def people_within_project(self, project_id):
+        """
+        This will return all of the people that can access the given project.
+        """
+        path = '/projects/%u/people.xml' % (project_id, )
+        return self._request(path)
+
     def people_per_project(self, project_id, company_id):
         """
         This will return all of the people in the given company that can
