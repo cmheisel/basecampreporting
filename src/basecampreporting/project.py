@@ -77,7 +77,8 @@ class Project(BasecampObject):
 
     def __init_cache(self):
         self.cache = dict(messages = [], comments = [],
-                          milestones = [], todo_lists = {}, time_entries = [])
+                          milestones = [], todo_lists = {}, time_entries = [],
+                          people = {} )
 
     def _get_project_info(self):
         project_xml = self.bc._request("/projects/%s.xml" % self.id)
@@ -126,6 +127,15 @@ class Project(BasecampObject):
         self.cache['time_entries'] = time_entries
         return self.cache['time_entries']
             
+    @property
+    def people(self):
+        '''Dictionary of people on the project, keyed by id'''
+        if self.cache['people']: return self.cache['people']
+        people_xml = self.bc.people_within_project(self.id)
+        for person_node in ET.fromstring(people_xml).findall('person'):
+            p = Person(person_node)
+            self.cache['people'][p.id] = p
+        return self.cache['people']
 
     @property
     def comments(self):
@@ -288,6 +298,11 @@ class Message(BasecampObject):
 
 class TimeEntry(BasecampObject):
     '''Represents an Time Entry in Basecamp'''
+    def __init__(self, node):
+        self.set_initial_values(node)
+
+class Person(BasecampObject):
+    '''Represents a Person in Basecamp'''
     def __init__(self, node):
         self.set_initial_values(node)
 

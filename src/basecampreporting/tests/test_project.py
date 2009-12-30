@@ -60,6 +60,10 @@ class ProjectTests(unittest.TestCase):
     def test_project_title(self):
         self.assertEqual("API Testing Project", self.project.name)
 
+    def test_people(self):
+        self.assertEqual(2, len(self.project.people.keys()))
+        self.assertEqual("API", self.project.people[3396981].first_name)
+
 def test_suite():
     return unittest.makeSuite(ProjectTests)
         
