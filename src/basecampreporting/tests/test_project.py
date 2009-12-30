@@ -23,7 +23,7 @@ class ProjectTests(unittest.TestCase):
 
     def tearDown(self):
         self.project.bc.save_test_fixtures(self.fixtures_path)
-        
+
     def test_latest_message(self):
         self.assertEqual("This is the newest message",
                          self.project.messages[0].title)
@@ -52,7 +52,7 @@ class ProjectTests(unittest.TestCase):
         expected = [0, 1, 2]
         actual = [sprint.sprint_number for sprint in self.project.sprints]
         self.assertEqual(expected, actual)
-        
+
         self.assertEqual(1, self.project.current_sprint.sprint_number)
         self.assertEqual("Sprint 1", self.project.current_sprint.name)
         self.assertEqual(1, len(self.project.upcoming_sprints))
@@ -64,9 +64,12 @@ class ProjectTests(unittest.TestCase):
         self.assertEqual(2, len(self.project.people.keys()))
         self.assertEqual("API", self.project.people[3396981].first_name)
 
+    def test_person(self):
+        self.assertEqual("API", self.project.person(3396981).first_name)
+
 def test_suite():
     return unittest.makeSuite(ProjectTests)
-        
+
 def main():
     unittest.main()
 

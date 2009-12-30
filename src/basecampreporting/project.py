@@ -10,7 +10,7 @@ class BasecampObject(object):
     '''Common class of Basecamp objects'''
     def __init__(self):
         super(self, BasecampObject).__init__()
-    
+
     def parse(self, node):
         return parse_basecamp_xml(node)
 
@@ -41,7 +41,7 @@ class BasecampObject(object):
 
     def to_json(self):
         return json.dumps(self.to_dict(), cls=BasecampObjectEncoder, indent=True)
-    
+
     def parse_datetime(self, value):
         year = int(value[0:4])
         month = int(value[5:7])
@@ -78,7 +78,7 @@ class Project(BasecampObject):
     def __init_cache(self):
         self.cache = dict(messages = [], comments = [],
                           milestones = [], todo_lists = {}, time_entries = [],
-                          people = {} )
+                          people = {}, persons = {} )
 
     def _get_project_info(self):
         project_xml = self.bc._request("/projects/%s.xml" % self.id)
@@ -111,7 +111,7 @@ class Project(BasecampObject):
             messages.append(Message(post))
         self.cache['messages'] = messages
         return self.cache['messages']
-    
+
     @property
     def time_entries(self, start_date=None, end_date=None):
         '''Array of all time entries'''
@@ -126,7 +126,7 @@ class Project(BasecampObject):
             time_entries.append(TimeEntry(entry))
         self.cache['time_entries'] = time_entries
         return self.cache['time_entries']
-            
+
     @property
     def people(self):
         '''Dictionary of people on the project, keyed by id'''
@@ -136,6 +136,14 @@ class Project(BasecampObject):
             p = Person(person_node)
             self.cache['people'][p.id] = p
         return self.cache['people']
+
+    def person(self, person_id):
+        '''Access a Person object by id'''
+        if not self.cache['persons'].get(person_id, None):
+            person_xml = self.bc.person(person_id)
+            p = Person(person_xml)
+            self.cache['persons'][person_id] = p
+        return self.cache['persons'][person_id]
 
     @property
     def comments(self):
@@ -197,7 +205,7 @@ class Project(BasecampObject):
         lists = [tdlist for tdlist in self.todo_lists.values() if tdlist.is_backlog]
         for alist in lists:
             backlogs[alist.name] = alist
-            
+
         return backlogs
 
     @property
@@ -230,7 +238,7 @@ class ToDoList(BasecampObject):
     def __init__(self, node):
         self.set_initial_values(node)
         self._extra_attributes = ['is_complete', 'is_sprint', 'is_backlog']
-        
+
     @property
     def is_complete(self):
         return cast_to_boolean(self.complete)
@@ -261,7 +269,7 @@ class Milestone(BasecampObject):
     def __init__(self, node):
         self.set_initial_values(node)
         self._extra_attributes = ['is_previous', 'is_upcoming', 'is_late']
-        
+
     def __cmp__(self, other):
         return cmp(self.deadline, other.deadline)
 
