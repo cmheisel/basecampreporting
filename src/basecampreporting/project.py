@@ -5,6 +5,7 @@ from basecampreporting.etree import ET
 from basecampreporting.serialization import json, BasecampObjectEncoder
 from basecampreporting.basecamp import Basecamp
 from basecampreporting.parser import parse_basecamp_xml, cast_to_boolean
+from urllib2 import HTTPError
 
 class BasecampObject(object):
     '''Common class of Basecamp objects'''
@@ -140,9 +141,12 @@ class Project(BasecampObject):
     def person(self, person_id):
         '''Access a Person object by id'''
         if not self.cache['persons'].get(person_id, None):
-            person_xml = self.bc.person(person_id)
-            p = Person(person_xml)
-            self.cache['persons'][person_id] = p
+            try:
+                person_xml = self.bc.person(person_id)
+                p = Person(person_xml)
+                self.cache['persons'][person_id] = p
+            except HTTPError:
+                return None
         return self.cache['persons'][person_id]
 
     @property
