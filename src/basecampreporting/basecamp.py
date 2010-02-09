@@ -263,6 +263,14 @@ class Basecamp(object):
 
     # Comments
 
+
+    def comments_within_todoitem(self, resource_id):
+        """
+        This will return all of the comments for a given resource, just todo-items for now
+        """
+        path = '/todo_items/%u/comments.xml' % (resource_id, )
+        return self._request(path)
+
     def comments(self, message_id):
         """
         Return the list of comments associated with the specified message.
