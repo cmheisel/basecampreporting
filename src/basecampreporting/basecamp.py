@@ -96,6 +96,13 @@ class Basecamp(object):
         path = '/contacts/company/%u' % company_id
         return self._request(path)
 
+    def companies(self):
+        """
+        This will return a list of all companies visible to the requesting user.
+        """
+        path = '/companies'
+        return self._request(path)
+        
     def file_categories(self, project_id):
         """
         This will return an alphabetical list of all file categories in the
@@ -119,13 +126,6 @@ class Basecamp(object):
         returned to include only those that can access the given project.
         """
         path = '/contacts/people/%u' % company_id
-        return self._request(path)
-
-    def people_within_project(self, project_id):
-        """
-        This will return all of the people that can access the given project.
-        """
-        path = '/projects/%u/people.xml' % (project_id, )
         return self._request(path)
 
     def people_per_project(self, project_id, company_id):
@@ -559,17 +559,4 @@ class Basecamp(object):
         Deletes the given milestone from the project.
         """
         path = '/milestones/delete/%u' % milestone_id
-        return self._request(path)
-        
-    # ---------------------------------------------------------------- #
-    # Time Tracking
-    
-    def list_time_entries(self, project_id, start_date, end_date):
-        """
-        This lets you query the time tracking report for a project. You can
-        either return all time logs, or filter based on date.
-        """
-        path = '/time/report/0/%s/%s/p%s' % (start_date.strftime('%Y%m%d'),
-                                             end_date.strftime('%Y%m%d'),
-                                             project_id)
         return self._request(path)
